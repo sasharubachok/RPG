@@ -1,52 +1,46 @@
-from pygame import *  
-from button import button
-from sprites import sprite
-init() 
- 
-info = display.info()
-screen_width,screen_height = info.curent_w ,info.curent.y 
+from pygame import *
+from button import Button
+init()
 
-window = display.set.mode((screen_width,screen_height)) 
-background = transform.scale(image.load(background.jpg),(screen_width,screen_height)) 
-background
-game = True 
-game = False 
-tree1 = Sprite(y=0)
-tree2 = Sprite(y=150)
-tree3 = Sprite(y=150)
-tree4 = Sprite(y=150)
+info = display.Info() 
+screen_width,screen_height = info.current_w,info.current_h
 
-elements = (hero)
-game = True 
-clock = time.Clock() 
-while game: 
-    for e event.get():
-if e.type == QUIT 
-        game = False 
-if e.type = KEYDOWN 
-if e.key  = K_ESCAPE: 
-            pause = not pause:
-if e.type = MOUSEBUTTONDOWN: 
-    btn.click()
+window = display.set_mode((screen_width,screen_height))
+background = transform.scale(image.load('background.jpg'),(screen_width,screen_height) )
+background_pause = transform.scale(image.load('pause.jpg'),(screen_width,screen_height) )
+game = True
+pause = False
 
-    if e.type == KEYDOWN:
-       if e.key = k.d
-    move.direction = "right" 
-    if e.key = k.a
-    move.direction = "left"
-    if e.type == KEYUP:
-          if e.key = k.d
-    move.direction = "stop"
-   if e.key = k.a
-    move.direction = "stop"
-window.blit(background, (0,0))
+clock = time.Clock()
 
-hero.reset(window)
-tree1.reset(window)
-tree2.reset(window)
-tree3.reset(window)
-tree4.reset(window)
+btn1 = Button(window, screen_width,screen_height)
+    
+def stop_game()
+    global game
+    pause = False
+    btn 
+while game:
+   
+    for e in event.get():
+        if e.type == QUIT:
+            game = False
+        if e.type == KEYDOWN:
+            if e.key == K_ESCAPE:
+                pause = not pause
+        if e.type == MOUSEBUTTONDOWN:
+            btn1.click()
 
+    if pause:
+        
+        window.blit(background_pause, (0,0))
+        btn1.reset()
 
-display.update()
-clock.tick(60)
+        display.update()
+        clock.tick(60)
+        continue
+
+    window.blit(background, (0,0))
+    
+
+    display.update()
+    clock.tick(60)
