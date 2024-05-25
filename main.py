@@ -1,4 +1,5 @@
 from pygame import *
+from random import randint
 init() 
  
 info = display.Info()
@@ -39,6 +40,13 @@ class Sprite(sprite.Sprite):
     def reset(self, window):
         window.blit(self.image, (self.rect.x, self.rect.y))
 
+    def random_respawn(self):
+        self.rect.x = randint(0, screen_width-50)
+        self.rect.y = randint(0, screen_height-50)
+
+    def collide(self, obj):
+        return self.rect.colliderect(obj.rect)
+
 class Hero(Sprite):
     def __init__(self,screen_width,screen_height):
         self.height = 50
@@ -68,6 +76,31 @@ class Hero(Sprite):
 
                 self.rect.y += self.speed
 
+class Enemy(Sprite):
+    def __init__(self,x_start,x_end, y_start ,y_end):
+        self.height = 70
+        self.width = 70
+        self.x = x_start
+        self.y = y_start
+        super().__init__( 'enemy.png', self.x,self.y,self.width,self.height,10)
+        self.x_start = x_start
+        self.x_end = x_end 
+        self.y_start = y_start 
+        self.y_end = y_end
+        self.speed = 2
+        self.direction ='left'
+
+    def move(self):
+        if self.direction == 'left':
+            self.rect.x -= self.speed
+        if self.direction == 'right':
+            self.rect.x += self.speed
+        if self.rect.x > self.x_end:
+            self.direction = 'left'
+        if self.rect.x < self.x_start:
+            self.direction = 'right'
+        
+
 
 
 window = display.set_mode((screen_width,screen_height)) 
@@ -75,20 +108,36 @@ background = transform.scale(image.load("bg.jpg"),(screen_width,screen_height))
 game = True 
 pause = True
 clock = time.Clock() 
-
+hero = Hero(screen_width,screen_height)
 def stop_game():
     global game
     game = False
+def start_game():
+    hero.rect.x = 500
+    hero.rect.y = 500
+    
+    global pause
+    pause = False
+btn1 = Button(600, 500, stop_game, 'exit.png')
+btn2 = Button(600, 450, start_game, 'start.png')
 
-btn1 = Button(600, 500, stop_game, 'bg.jpg')
-hero = Hero(screen_width,screen_height)
+coins = []
+for i in range(0, 10):
+    coin = Sprite('coins.png',randint(0, screen_width-50), randint(0, screen_height-50), 50, 50,0 )
+    coins.append(coin)
 
+enemys = [] 
+enemy1 = Enemy(10, 400, 100, 100)
+enemys.append(enemy1)
+enemy1 = Enemy(300, 600, 300, 300)
+enemys.append(enemy1)
 
 
 while game: 
     for e in event.get():
         if pause:
             btn1.click(e) 
+            btn2.click(e) 
         if e.type == QUIT :
             game = False 
         if e.type == KEYDOWN:
@@ -98,6 +147,7 @@ while game:
     if pause:
         window.blit(background, (0,0))
         btn1.reset(window)
+        btn2.reset(window)
 
         display.update()
         clock.tick(60)
@@ -105,7 +155,19 @@ while game:
 
     
     window.blit(background, (0,0))
+
+    for c in coins:
+        c.reset(window)
+        if c.collide(hero):
+            c.random_respawn()
+
     hero.reset(window)
     hero.move()
+    for i in enemys:
+        if i.collide(hero):
+            pause = True
+
+        i.reset(window)
+        i.move()
     display.update()
     clock.tick(60)
